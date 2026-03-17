@@ -68,6 +68,7 @@ html {
 
 /* Sidebar Styles */
 .app-sidebar {
+  overflow-x: hidden;
   width: 233px;
   background-color: #051529;
   overflow-y: auto;

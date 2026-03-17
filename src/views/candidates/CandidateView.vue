@@ -6,6 +6,7 @@
       <h1 class="page-title commons-fs-20 commons-fw-700">Candidates</h1>
       <div class="header-actions commons-display-flex">
         <button
+          @click="addCandidate"
           class="btn-add-candidate commons-flex-center commons-color-white commons-border-none commons-fs-14 commons-fw-500 commons-pointer commons-transition-bg"
         >
           <span class="btn-icon icon-add-candidate"></span>
@@ -24,6 +25,7 @@
       <div class="search-box commons-flex-center commons-rounded-4 commons-bg-white">
         <span class="icon-ai-search-candidate"></span>
         <input
+          v-model="searchQuery"
           type="text"
           placeholder="Quick Search or AI Assistant"
           class="filter-search-input commons-flex-1 commons-border-none commons-outline-none commons-fs-14"
@@ -186,7 +188,54 @@
               <th class="col-actions"></th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <tr v-for="(candidate, index) in filteredCandidates2()" :key="candidate.index">
+              <td class="col-checkbox"><input type="checkbox" /></td>
+              <td class="col-fullname">{{ candidate.fullName }}</td>
+              <td class="col-email">{{ candidate.email }}</td>
+              <td class="col-phone">{{ candidate.phone }}</td>
+              <td class="col-campaign">{{ candidate.campaign }}</td>
+              <td class="col-position">{{ candidate.position }}</td>
+              <td class="col-jobs">{{ candidate.jobs }}</td>
+              <td class="col-round">{{ candidate.round }}</td>
+              <td class="col-review">{{ candidate.review }}</td>
+              <td class="col-appdate">{{ candidate.applicationDate }}</td>
+              <td class="col-source">{{ candidate.source }}</td>
+              <td class="col-training">{{ candidate.trainingLevel }}</td>
+              <td class="col-place">{{ candidate.trainingPlace }}</td>
+              <td class="col-major">{{ candidate.major }}</td>
+              <td class="col-workplace">{{ candidate.workplace }}</td>
+              <td class="col-recommend">{{ candidate.recommendingStaff }}</td>
+              <td class="col-department">{{ candidate.department }}</td>
+              <td class="col-compat">{{ candidate.compatibilityLevel }}</td>
+              <td class="col-area">{{ candidate.area }}</td>
+              <td class="col-referral">{{ candidate.referral }}</td>
+              <td class="col-receipt">{{ candidate.receiptInfo }}</td>
+              <td class="col-talent">{{ candidate.inTalentPool }}</td>
+              <td class="col-portal">{{ candidate.portalAccount }}</td>
+              <td class="col-tag">{{ candidate.tag }}</td>
+              <td class="col-status">{{ candidate.status }}</td>
+              <td class="col-sex">{{ candidate.sex }}</td>
+              <td class="col-dob">{{ candidate.dateOfBirth }}</td>
+              <td class="col-address">{{ candidate.address }}</td>
+              <td class="col-reason">{{ candidate.reason }}</td>
+              <td class="col-collab">{{ candidate.collaborators }}</td>
+              <td class="col-receiptdate">{{ candidate.receiptDate }}</td>
+              <td class="col-offer">{{ candidate.jobOfferStatus }}</td>
+              <td class="col-actions">
+                <!-- <button class="action-btn edit-btn" title="Edit">
+                  <span class="icon-edit"></span>
+                </button> -->
+                <button
+                  @click="deleteCandidate(index)"
+                  class="action-btn delete-btn"
+                  title="Delete"
+                >
+                  <span class="icon-delete">Delete</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -217,7 +266,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watchEffect  } from 'vue'
 
 const candidates = ref([
   {
@@ -252,7 +301,7 @@ const candidates = ref([
     reason: 'Career Growth',
     collaborators: 'HR Team',
     receiptDate: '2024-01-16',
-    jobOfferStatus: 'Pending'
+    jobOfferStatus: 'Pending',
   },
   {
     id: 2,
@@ -286,7 +335,7 @@ const candidates = ref([
     reason: 'Better Opportunity',
     collaborators: 'Marketing Team',
     receiptDate: '2024-01-21',
-    jobOfferStatus: 'Accepted'
+    jobOfferStatus: 'Accepted',
   },
   {
     id: 3,
@@ -320,7 +369,7 @@ const candidates = ref([
     reason: 'New Challenge',
     collaborators: 'Tech Team',
     receiptDate: '2024-02-02',
-    jobOfferStatus: 'Pending'
+    jobOfferStatus: 'Pending',
   },
   {
     id: 4,
@@ -354,7 +403,7 @@ const candidates = ref([
     reason: 'Creative Environment',
     collaborators: 'Design Team',
     receiptDate: '2024-02-11',
-    jobOfferStatus: 'Pending'
+    jobOfferStatus: 'Pending',
   },
   {
     id: 5,
@@ -388,73 +437,109 @@ const candidates = ref([
     reason: 'Technical Growth',
     collaborators: 'DevOps Team',
     receiptDate: '2024-02-16',
-    jobOfferStatus: 'Negotiating'
-  }
+    jobOfferStatus: 'Negotiating',
+  },
 ])
 
-const renderTableData = () => {
-  const tbody = document.querySelector('.candidates-table tbody')
-  if (!tbody) return
+//addCandidate
 
-  tbody.innerHTML = candidates.value.map(candidate => `
-    <tr>
-      <td class="col-checkbox"><input type="checkbox" /></td>
-      <td class="col-fullname">${candidate.fullName}</td>
-      <td class="col-email">${candidate.email}</td>
-      <td class="col-phone">${candidate.phone}</td>
-      <td class="col-campaign">${candidate.campaign}</td>
-      <td class="col-position">${candidate.position}</td>
-      <td class="col-jobs">${candidate.jobs}</td>
-      <td class="col-round">${candidate.round}</td>
-      <td class="col-review">${candidate.review}</td>
-      <td class="col-appdate">${candidate.applicationDate}</td>
-      <td class="col-source">${candidate.source}</td>
-      <td class="col-training">${candidate.trainingLevel}</td>
-      <td class="col-place">${candidate.trainingPlace}</td>
-      <td class="col-major">${candidate.major}</td>
-      <td class="col-workplace">${candidate.workplace}</td>
-      <td class="col-recommend">${candidate.recommendingStaff}</td>
-      <td class="col-department">${candidate.department}</td>
-      <td class="col-compat">${candidate.compatibilityLevel}</td>
-      <td class="col-area">${candidate.area}</td>
-      <td class="col-referral">${candidate.referral}</td>
-      <td class="col-receipt">${candidate.receiptInfo}</td>
-      <td class="col-talent">${candidate.inTalentPool}</td>
-      <td class="col-portal">${candidate.portalAccount}</td>
-      <td class="col-tag">${candidate.tag}</td>
-      <td class="col-status">${candidate.status}</td>
-      <td class="col-sex">${candidate.sex}</td>
-      <td class="col-dob">${candidate.dateOfBirth}</td>
-      <td class="col-address">${candidate.address}</td>
-      <td class="col-reason">${candidate.reason}</td>
-      <td class="col-collab">${candidate.collaborators}</td>
-      <td class="col-receiptdate">${candidate.receiptDate}</td>
-      <td class="col-offer">${candidate.jobOfferStatus}</td>
-      <td class="col-actions">
-        <button class="action-btn edit-btn" title="Edit">
-          <span class="icon-edit"></span>
-        </button>
-        <button class="action-btn delete-btn" title="Delete">
-          <span class="icon-delete"></span>
-        </button>
-      </td>
-    </tr>
-  `).join('')
-
-  // Update total records
-  const totalRecordsElement = document.querySelector('.total-records strong')
-  if (totalRecordsElement) {
-    totalRecordsElement.textContent = candidates.value.length
+function addCandidate() {
+  const newCandidate = {
+    id: 6,
+    fullName: 'Nguyễn Văn 6',
+    email: 'an.nguyen@email.com',
+    phone: '0912345678',
+    campaign: 'IT Recruitment 2024',
+    position: 'Senior Frontend Developer',
+    jobs: 'FE-001',
+    round: 'Technical Interview',
+    review: 'Good',
+    applicationDate: '2024-01-15',
+    source: 'LinkedIn',
+    trainingLevel: 'University',
+    trainingPlace: 'Đại học Bách khoa Hà Nội',
+    major: 'Computer Science',
+    workplace: 'FPT Software',
+    recommendingStaff: 'Trần Thị Bình',
+    department: 'Technology',
+    compatibilityLevel: '85%',
+    area: 'Hà Nội',
+    referral: 'Internal',
+    receiptInfo: 'CV Received',
+    inTalentPool: 'Yes',
+    portalAccount: 'Active',
+    tag: 'JavaScript, Vue.js',
+    status: 'In Progress',
+    sex: 'Male',
+    dateOfBirth: '1995-06-15',
+    address: 'Cầu Giấy, Hà Nội',
+    reason: 'Career Growth',
+    collaborators: 'HR Team',
+    receiptDate: '2024-01-16',
+    jobOfferStatus: 'Pending',
   }
-
-  // Update page info
-  const pageInfoElement = document.querySelector('.page-info')
-  if (pageInfoElement) {
-    pageInfoElement.textContent = `1 - ${candidates.value.length} record`
-  }
+  candidates.value.push(newCandidate)
+  console.log('Candidate added:', newCandidate)
 }
 
-onMounted(() => {
-  renderTableData()
+const deleteCandidate = (index) => {
+  //  const indexDelete = candidates.value.findIndex(candidate => candidate.id === index)
+  //c1
+  //  candidates.value.splice(index,1)
+  //c2
+  // candidates.value = candidates.value.filter((c, i) => {
+  //   //lọc những item khác index
+  //   return i !== index
+  // })
+  //c3
+  // candidates.value = candidates.value.slice(0,index).concat(candidates.value.slice(index + 1))
+  //c4
+  candidates.value = [...candidates.value.slice(0,index),...candidates.value.slice(index + 1)]
+}
+
+//search
+const searchQuery = ref('')
+
+//computed để lọc dữ liệu candidates dựa trên searchQuery
+//computed:lắng nghe biến ref, nếu biến đó thay đổi thì sẽ thực hiện call back và trả lại kết quả 
+// const filteredCandidates2 = computed(() => {
+//   // console.log('Filtering candidates with search query:', searchQuery.value)
+
+//   if(!searchQuery.value) {
+//     return candidates.value
+//   }
+//   return candidates.value.filter(c=>{
+//     return c.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
+//   })
+// })
+
+//khi dùng hàm thì nó load lại componet candidate view mỗi lần searchQuery thay đổi, 
+// còn khi dùng computed thì nó sẽ chỉ tính toán lại filteredCandidates2 khi searchQuery
+// thay đổi mà không cần load lại component
+const filteredCandidates2 = ()=>{
+  console.log('Filtering candidates with search query:', searchQuery.value)
+  if(!searchQuery.value) {
+    return candidates.value
+  }
+  
+  return candidates.value.filter(c=>{
+    return c.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
+  })
+}
+
+//watch: lắng nghe biến ref, khi biến đó thay đổi thì sẽ thực hiện call back 
+// nhưng không trả lại kết quả như computed mà nó sẽ thực hiện các tác vụ khác 
+// như gọi API, log ra console,...
+
+//watcheffect: tương tự như watch nhưng nó sẽ tự động chạy callback ngay khi được định nghĩa,
+// và nó cũng sẽ tự động theo dõi tất cả các biến ref được sử dụng trong callback, 
+// khi bất kỳ biến nào trong số đó thay đổi thì callback sẽ được thực hiện lại
+//side effect: tác dụng phụ, nó không ảnh hưởng đến logic chính của component nhưng nó 
+// có thể thực hiện các tác vụ khác như gọi API, log ra console,...
+watchEffect(() => {
+  console.log('Chiều dài: ', candidates.value.length)
 })
+
+
+onMounted(() => {})
 </script>

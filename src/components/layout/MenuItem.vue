@@ -9,6 +9,7 @@
     ></span>
     <span
       class="menu-text commons-fs-14 commons-fw-500 commons-text-nowrap commons-text-ellipsis"
+      v-if="!sidebarCollapsed"
       >{{ text }}</span
     >
   </div>
@@ -31,6 +32,10 @@ defineProps({
   item: {
     type: Object,
     default: () => ({}),
+  },
+    sidebarCollapsed: {
+    type: Boolean,
+    required: true,
   },
 })
 
