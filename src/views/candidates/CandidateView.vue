@@ -5,53 +5,29 @@
     <div class="content-header commons-flex-between">
       <h1 class="page-title commons-fs-20 commons-fw-700">Candidates</h1>
       <div class="header-actions commons-display-flex">
-        <button
-          @click="addCandidate"
-          class="btn-add-candidate commons-flex-center commons-color-white commons-border-none commons-fs-14 commons-fw-500 commons-pointer commons-transition-bg"
-        >
-          <span class="btn-icon icon-add-candidate"></span>
-          <span>Add candidate</span>
-        </button>
-        <button
-          class="btn-dropdown commons-flex-center-all commons-color-white commons-border-none commons-pointer commons-transition-bg"
-        >
-          <span class="dropdown-icon icon-down"></span>
-        </button>
+        <BaseButton
+          text="Add candidate"
+          icon="icon-add-candidate"
+          variant="primary"
+          custom-class="btn-add-candidate"
+          @click="openAddCandidateModal"
+        />
+        <BaseButton icon="icon-down" variant="primary" custom-class="btn-dropdown" />
       </div>
     </div>
 
     <!-- Filter Section -->
     <div class="filter-section commons-flex-between commons-bg-white">
-      <div class="search-box commons-flex-center commons-rounded-4 commons-bg-white">
-        <span class="icon-ai-search-candidate"></span>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Quick Search or AI Assistant"
-          class="filter-search-input commons-flex-1 commons-border-none commons-outline-none commons-fs-14"
-        />
-      </div>
+      <BaseInput
+        placeholder="Quick Search or AI Assistant"
+        icon="icon-ai-search-candidate"
+        wrapper-class="search-box commons-bg-white"
+      />
       <div class="filter-actions commons-display-flex">
-        <button
-          class="filter-btn commons-flex-center-all commons-rounded-4 commons-bg-white commons-pointer commons-transition-bg"
-        >
-          <span class="icon-filter"></span>
-        </button>
-        <button
-          class="filter-btn commons-flex-center-all commons-rounded-4 commons-bg-white commons-pointer commons-transition-bg"
-        >
-          <span class="icon-export"></span>
-        </button>
-        <button
-          class="filter-btn commons-flex-center-all commons-rounded-4 commons-bg-white commons-pointer commons-transition-bg"
-        >
-          <span class="icon-interactive-history"></span>
-        </button>
-        <button
-          class="filter-btn commons-flex-center-all commons-rounded-4 commons-bg-white commons-pointer commons-transition-bg"
-        >
-          <span class="icon-setting-column"></span>
-        </button>
+        <BaseButton icon="icon-filter" variant="secondary" custom-class="filter-btn" />
+        <BaseButton icon="icon-export" variant="secondary" custom-class="filter-btn" />
+        <BaseButton icon="icon-interactive-history" variant="secondary" custom-class="filter-btn" />
+        <BaseButton icon="icon-setting-column" variant="secondary" custom-class="filter-btn" />
       </div>
     </div>
 
@@ -64,36 +40,31 @@
         <a class="selection-select-all commons-pointer commons-fs-14">Select all on the list</a>
       </div>
       <div class="selection-actions commons-flex-center">
-        <button
-          class="toolbar-btn commons-flex-center commons-pointer commons-border-none commons-bg-transparent"
-        >
-          <span class="icon-email"></span>
-          <span class="commons-fs-14">Send email</span>
-        </button>
-        <button
-          class="toolbar-btn commons-flex-center commons-pointer commons-border-none commons-bg-transparent"
-        >
-          <span class="icon-tag"></span>
-          <span class="commons-fs-14">Manage tag</span>
-        </button>
-        <button
-          class="toolbar-btn commons-flex-center commons-pointer commons-border-none commons-bg-transparent"
-        >
-          <span class="icon-task"></span>
-          <span class="commons-fs-14">Create task</span>
-        </button>
-        <button
-          class="toolbar-btn commons-flex-center commons-pointer commons-border-none commons-bg-transparent"
-        >
-          <span class="icon-campaign"></span>
-          <span class="commons-fs-14">Add to campaign</span>
-        </button>
-        <button
-          class="toolbar-btn toolbar-btn-delete commons-flex-center commons-pointer commons-border-none commons-bg-transparent"
-        >
-          <span class="icon-delete" style="width: 20px; height: 20px"></span>
-          <span class="commons-fs-14">Delete</span>
-        </button>
+        <BaseButton
+          text="Send email"
+          icon="icon-email"
+          variant="ghost"
+          custom-class="toolbar-btn"
+        />
+        <BaseButton text="Manage tag" icon="icon-tag" variant="ghost" custom-class="toolbar-btn" />
+        <BaseButton
+          text="Create task"
+          icon="icon-task"
+          variant="ghost"
+          custom-class="toolbar-btn"
+        />
+        <BaseButton
+          text="Add to campaign"
+          icon="icon-campaign"
+          variant="ghost"
+          custom-class="toolbar-btn"
+        />
+        <BaseButton
+          text="Delete"
+          icon="icon-delete"
+          variant="ghost"
+          custom-class="toolbar-btn toolbar-btn-delete"
+        />
       </div>
     </div>
 
@@ -101,445 +72,145 @@
     <div class="table-container commons-flex-1 commons-overflow-hidden commons-flex-col">
       <div class="table-wrapper commons-flex-1 commons-overflow-auto">
         <table class="candidates-table commons-w-full commons-fs-14">
-          <thead>
-            <tr>
-              <th class="col-checkbox"><input type="checkbox" /></th>
-              <th class="col-fullname commons-fw-700 commons-text-left commons-text-nowrap">
-                Full name
-              </th>
-              <th class="col-email commons-fw-700 commons-text-left commons-text-nowrap">Email</th>
-              <th class="col-phone commons-fw-700 commons-text-left commons-text-nowrap">
-                Phone number
-              </th>
-              <th class="col-campaign commons-fw-700 commons-text-left commons-text-nowrap">
-                Recruitment campaign
-              </th>
-              <th class="col-position commons-fw-700 commons-text-left commons-text-nowrap">
-                Recruiting position
-              </th>
-              <th class="col-jobs commons-fw-700 commons-text-left commons-text-nowrap">Jobs</th>
-              <th class="col-round commons-fw-700 commons-text-left commons-text-nowrap">
-                Recruitment round
-              </th>
-              <th class="col-review commons-fw-700 commons-text-left commons-text-nowrap">
-                Review
-              </th>
-              <th class="col-appdate commons-fw-700 commons-text-left commons-text-nowrap">
-                Application date
-              </th>
-              <th class="col-source commons-fw-700 commons-text-left commons-text-nowrap">
-                Candidate source
-              </th>
-              <th class="col-training commons-fw-700 commons-text-left commons-text-nowrap">
-                Training level
-              </th>
-              <th class="col-place commons-fw-700 commons-text-left commons-text-nowrap">
-                Training place
-              </th>
-              <th class="col-major commons-fw-700 commons-text-left commons-text-nowrap">Major</th>
-              <th class="col-workplace commons-fw-700 commons-text-left commons-text-nowrap">
-                Recent Workplace
-              </th>
-              <th class="col-recommend commons-fw-700 commons-text-left commons-text-nowrap">
-                Recommending staff
-              </th>
-              <th class="col-department commons-fw-700 commons-text-left commons-text-nowrap">
-                Using department
-              </th>
-              <th class="col-compat commons-fw-700 commons-text-left commons-text-nowrap">
-                Compatibility level
-              </th>
-              <th class="col-area commons-fw-700 commons-text-left commons-text-nowrap">Area</th>
-              <th class="col-referral commons-fw-700 commons-text-left commons-text-nowrap">
-                Referral
-              </th>
-              <th class="col-receipt commons-fw-700 commons-text-left commons-text-nowrap">
-                Receipt information
-              </th>
-              <th class="col-talent commons-fw-700 commons-text-left commons-text-nowrap">
-                In talent pool
-              </th>
-              <th class="col-portal commons-fw-700 commons-text-left commons-text-nowrap">
-                Candidate portal account
-              </th>
-              <th class="col-tag commons-fw-700 commons-text-left commons-text-nowrap">Tag</th>
-              <th class="col-status commons-fw-700 commons-text-left commons-text-nowrap">
-                Status
-              </th>
-              <th class="col-sex commons-fw-700 commons-text-left commons-text-nowrap">Sex</th>
-              <th class="col-dob commons-fw-700 commons-text-left commons-text-nowrap">
-                Date of birth
-              </th>
-              <th class="col-address commons-fw-700 commons-text-left commons-text-nowrap">
-                Address
-              </th>
-              <th class="col-reason commons-fw-700 commons-text-left commons-text-nowrap">
-                Reason
-              </th>
-              <th class="col-collab commons-fw-700 commons-text-left commons-text-nowrap">
-                Collaborators
-              </th>
-              <th class="col-receiptdate commons-fw-700 commons-text-left commons-text-nowrap">
-                Receipt date
-              </th>
-              <th class="col-offer commons-fw-700 commons-text-left commons-text-nowrap">
-                Job offer status
-              </th>
-              <th class="col-actions"></th>
-            </tr>
-          </thead>
+          <TableHeader :columns="columns" @select-all="handleSelectAll" />
           <tbody>
-            <tr v-for="(candidate, index) in filteredCandidates2()" :key="candidate.index">
-              <td class="col-checkbox"><input type="checkbox" /></td>
-              <td class="col-fullname">{{ candidate.fullName }}</td>
-              <td class="col-email">{{ candidate.email }}</td>
-              <td class="col-phone">{{ candidate.phone }}</td>
-              <td class="col-campaign">{{ candidate.campaign }}</td>
-              <td class="col-position">{{ candidate.position }}</td>
-              <td class="col-jobs">{{ candidate.jobs }}</td>
-              <td class="col-round">{{ candidate.round }}</td>
-              <td class="col-review">{{ candidate.review }}</td>
-              <td class="col-appdate">{{ candidate.applicationDate }}</td>
-              <td class="col-source">{{ candidate.source }}</td>
-              <td class="col-training">{{ candidate.trainingLevel }}</td>
-              <td class="col-place">{{ candidate.trainingPlace }}</td>
-              <td class="col-major">{{ candidate.major }}</td>
-              <td class="col-workplace">{{ candidate.workplace }}</td>
-              <td class="col-recommend">{{ candidate.recommendingStaff }}</td>
-              <td class="col-department">{{ candidate.department }}</td>
-              <td class="col-compat">{{ candidate.compatibilityLevel }}</td>
-              <td class="col-area">{{ candidate.area }}</td>
-              <td class="col-referral">{{ candidate.referral }}</td>
-              <td class="col-receipt">{{ candidate.receiptInfo }}</td>
-              <td class="col-talent">{{ candidate.inTalentPool }}</td>
-              <td class="col-portal">{{ candidate.portalAccount }}</td>
-              <td class="col-tag">{{ candidate.tag }}</td>
-              <td class="col-status">{{ candidate.status }}</td>
-              <td class="col-sex">{{ candidate.sex }}</td>
-              <td class="col-dob">{{ candidate.dateOfBirth }}</td>
-              <td class="col-address">{{ candidate.address }}</td>
-              <td class="col-reason">{{ candidate.reason }}</td>
-              <td class="col-collab">{{ candidate.collaborators }}</td>
-              <td class="col-receiptdate">{{ candidate.receiptDate }}</td>
-              <td class="col-offer">{{ candidate.jobOfferStatus }}</td>
-              <td class="col-actions">
-                <!-- <button class="action-btn edit-btn" title="Edit">
-                  <span class="icon-edit"></span>
-                </button> -->
-                <button
-                  @click="deleteCandidate(index)"
-                  class="action-btn delete-btn"
-                  title="Delete"
-                >
-                  <span class="icon-delete">Delete</span>
-                </button>
-              </td>
-            </tr>
+            <TableRow
+              v-for="candidate in candidates"
+              :key="candidate.id"
+              :item="candidate"
+              :columns="columns"
+              :is-selected="selectedCandidates.includes(candidate.id)"
+              @toggle-select="handleToggleSelect"
+              @edit="handleEdit"
+              @delete="handleDelete"
+            />
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- Pagination Section -->
-    <div class="pagination-section commons-flex-between">
-      <div class="total-records commons-fs-14">Total: <strong>0</strong> record</div>
-      <div class="pagination-controls commons-flex-center">
-        <span class="records-label commons-fs-14">Number of records/page</span>
-        <select class="records-select commons-rounded-4 commons-fs-14 commons-pointer">
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-        <span class="page-info commons-fs-14">1 - 2 record</span>
-        <button
-          class="page-btn prev commons-border-none commons-flex-center-all commons-fs-16"
-          disabled
-        >
-          <div class="icon-left"></div>
-        </button>
-        <button class="page-btn next commons-border-none commons-flex-center-all commons-fs-16">
-          <div class="icon-right"></div>
-        </button>
-      </div>
-    </div>
+    <TablePagination
+      :total-records="totalRecords"
+      v-model:page-size="pageSize"
+      :current-page="currentPage"
+      @prev-page="handlePrevPage"
+      @next-page="handleNextPage"
+    />
+
+    <!-- Add Candidate Modal -->
+    <CandidateForm
+      v-if="showAddCandidateModal"
+      @close="closeAddCandidateModal"
+      @save="handleSaveCandidate"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watchEffect  } from 'vue'
+import { ref } from 'vue'
+import BaseButton from '@/components/common/BaseButton.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
+import TableHeader from '@/components/table/TableHeader.vue'
+import TableRow from '@/components/table/TableRow.vue'
+import TablePagination from '@/components/table/TablePagination.vue'
+import CandidateForm from './CandidateForm.vue'
 
-const candidates = ref([
-  {
-    id: 1,
-    fullName: 'Nguyễn Văn An',
-    email: 'an.nguyen@email.com',
-    phone: '0912345678',
-    campaign: 'IT Recruitment 2024',
-    position: 'Senior Frontend Developer',
-    jobs: 'FE-001',
-    round: 'Technical Interview',
-    review: 'Good',
-    applicationDate: '2024-01-15',
-    source: 'LinkedIn',
-    trainingLevel: 'University',
-    trainingPlace: 'Đại học Bách khoa Hà Nội',
-    major: 'Computer Science',
-    workplace: 'FPT Software',
-    recommendingStaff: 'Trần Thị Bình',
-    department: 'Technology',
-    compatibilityLevel: '85%',
-    area: 'Hà Nội',
-    referral: 'Internal',
-    receiptInfo: 'CV Received',
-    inTalentPool: 'Yes',
-    portalAccount: 'Active',
-    tag: 'JavaScript, Vue.js',
-    status: 'In Progress',
-    sex: 'Male',
-    dateOfBirth: '1995-06-15',
-    address: 'Cầu Giấy, Hà Nội',
-    reason: 'Career Growth',
-    collaborators: 'HR Team',
-    receiptDate: '2024-01-16',
-    jobOfferStatus: 'Pending',
-  },
-  {
-    id: 2,
-    fullName: 'Trần Thị Mai',
-    email: 'mai.tran@email.com',
-    phone: '0923456789',
-    campaign: 'Marketing Drive 2024',
-    position: 'Digital Marketing Manager',
-    jobs: 'MKT-002',
-    round: 'HR Interview',
-    review: 'Excellent',
-    applicationDate: '2024-01-20',
-    source: 'Company Website',
-    trainingLevel: 'Master',
-    trainingPlace: 'Đại học Kinh tế Quốc dân',
-    major: 'Marketing',
-    workplace: 'Vingroup',
-    recommendingStaff: 'Lê Văn Cường',
-    department: 'Marketing',
-    compatibilityLevel: '92%',
-    area: 'TP.HCM',
-    referral: 'External',
-    receiptInfo: 'Portfolio Received',
-    inTalentPool: 'No',
-    portalAccount: 'Active',
-    tag: 'SEO, Content Marketing',
-    status: 'Offer Extended',
-    sex: 'Female',
-    dateOfBirth: '1993-03-22',
-    address: 'Quận 1, TP.HCM',
-    reason: 'Better Opportunity',
-    collaborators: 'Marketing Team',
-    receiptDate: '2024-01-21',
-    jobOfferStatus: 'Accepted',
-  },
-  {
-    id: 3,
-    fullName: 'Lê Hoàng Nam',
-    email: 'nam.le@email.com',
-    phone: '0934567890',
-    campaign: 'Backend Developer Hunt',
-    position: 'Backend Developer',
-    jobs: 'BE-003',
-    round: 'Coding Test',
-    review: 'Good',
-    applicationDate: '2024-02-01',
-    source: 'VietnamWorks',
-    trainingLevel: 'University',
-    trainingPlace: 'Đại học Công nghệ - ĐHQGHN',
-    major: 'Software Engineering',
-    workplace: 'TMA Solutions',
-    recommendingStaff: 'Phạm Thị Dung',
-    department: 'Technology',
-    compatibilityLevel: '78%',
-    area: 'Đà Nẵng',
-    referral: 'Internal',
-    receiptInfo: 'CV Received',
-    inTalentPool: 'Yes',
-    portalAccount: 'Inactive',
-    tag: 'Node.js, Python',
-    status: 'Under Review',
-    sex: 'Male',
-    dateOfBirth: '1996-11-08',
-    address: 'Hải Châu, Đà Nẵng',
-    reason: 'New Challenge',
-    collaborators: 'Tech Team',
-    receiptDate: '2024-02-02',
-    jobOfferStatus: 'Pending',
-  },
-  {
-    id: 4,
-    fullName: 'Phạm Thu Hà',
-    email: 'ha.pham@email.com',
-    phone: '0945678901',
-    campaign: 'UI/UX Design Campaign',
-    position: 'UI/UX Designer',
-    jobs: 'DES-004',
-    round: 'Portfolio Review',
-    review: 'Outstanding',
-    applicationDate: '2024-02-10',
-    source: 'Behance',
-    trainingLevel: 'University',
-    trainingPlace: 'Đại học Kiến trúc Hà Nội',
-    major: 'Industrial Design',
-    workplace: 'Freelance',
-    recommendingStaff: 'Nguyễn Văn Em',
-    department: 'Design',
-    compatibilityLevel: '95%',
-    area: 'Hà Nội',
-    referral: 'External',
-    receiptInfo: 'Portfolio Received',
-    inTalentPool: 'Yes',
-    portalAccount: 'Active',
-    tag: 'Figma, Adobe XD',
-    status: 'Final Round',
-    sex: 'Female',
-    dateOfBirth: '1994-07-30',
-    address: 'Đống Đa, Hà Nội',
-    reason: 'Creative Environment',
-    collaborators: 'Design Team',
-    receiptDate: '2024-02-11',
-    jobOfferStatus: 'Pending',
-  },
-  {
-    id: 5,
-    fullName: 'Đỗ Minh Quân',
-    email: 'quan.do@email.com',
-    phone: '0956789012',
-    campaign: 'DevOps Recruitment 2024',
-    position: 'DevOps Engineer',
-    jobs: 'OPS-005',
-    round: 'System Design',
-    review: 'Excellent',
-    applicationDate: '2024-02-15',
-    source: 'GitHub',
-    trainingLevel: 'University',
-    trainingPlace: 'Đại học FPT',
-    major: 'Information Technology',
-    workplace: 'VNG Corporation',
-    recommendingStaff: 'Trần Thị Giang',
-    department: 'Infrastructure',
-    compatibilityLevel: '88%',
-    area: 'TP.HCM',
-    referral: 'Internal',
-    receiptInfo: 'GitHub Profile',
-    inTalentPool: 'No',
-    portalAccount: 'Active',
-    tag: 'Docker, Kubernetes, AWS',
-    status: 'Offer Extended',
-    sex: 'Male',
-    dateOfBirth: '1992-12-25',
-    address: 'Bình Thạnh, TP.HCM',
-    reason: 'Technical Growth',
-    collaborators: 'DevOps Team',
-    receiptDate: '2024-02-16',
-    jobOfferStatus: 'Negotiating',
-  },
-])
+const showAddCandidateModal = ref(false)
+const candidates = ref([])
+const selectedCandidates = ref([])
+const totalRecords = ref(0)
+const pageSize = ref(25)
+const currentPage = ref(1)
 
-//addCandidate
+const columns = [
+  { key: 'fullName', label: 'Full name', class: 'col-fullname' },
+  { key: 'email', label: 'Email', class: 'col-email' },
+  { key: 'phone', label: 'Phone number', class: 'col-phone' },
+  { key: 'campaign', label: 'Recruitment campaign', class: 'col-campaign' },
+  { key: 'position', label: 'Recruiting position', class: 'col-position' },
+  { key: 'jobs', label: 'Jobs', class: 'col-jobs' },
+  { key: 'round', label: 'Recruitment round', class: 'col-round' },
+  { key: 'review', label: 'Review', class: 'col-review' },
+  { key: 'appDate', label: 'Application date', class: 'col-appdate' },
+  { key: 'source', label: 'Candidate source', class: 'col-source' },
+  { key: 'training', label: 'Training level', class: 'col-training' },
+  { key: 'place', label: 'Training place', class: 'col-place' },
+  { key: 'major', label: 'Major', class: 'col-major' },
+  { key: 'workplace', label: 'Recent Workplace', class: 'col-workplace' },
+  { key: 'recommend', label: 'Recommending staff', class: 'col-recommend' },
+  { key: 'department', label: 'Using department', class: 'col-department' },
+  { key: 'compat', label: 'Compatibility level', class: 'col-compat' },
+  { key: 'area', label: 'Area', class: 'col-area' },
+  { key: 'referral', label: 'Referral', class: 'col-referral' },
+  { key: 'receipt', label: 'Receipt information', class: 'col-receipt' },
+  { key: 'talent', label: 'In talent pool', class: 'col-talent' },
+  { key: 'portal', label: 'Candidate portal account', class: 'col-portal' },
+  { key: 'tag', label: 'Tag', class: 'col-tag' },
+  { key: 'status', label: 'Status', class: 'col-status' },
+  { key: 'sex', label: 'Sex', class: 'col-sex' },
+  { key: 'dob', label: 'Date of birth', class: 'col-dob' },
+  { key: 'address', label: 'Address', class: 'col-address' },
+  { key: 'reason', label: 'Reason', class: 'col-reason' },
+  { key: 'collab', label: 'Collaborators', class: 'col-collab' },
+  { key: 'receiptDate', label: 'Receipt date', class: 'col-receiptdate' },
+  { key: 'offer', label: 'Job offer status', class: 'col-offer' },
+]
 
-function addCandidate() {
+const handleSelectAll = (checked) => {
+  if (checked) {
+    selectedCandidates.value = candidates.value.map((c) => c.id)
+  } else {
+    selectedCandidates.value = []
+  }
+}
+
+const handleToggleSelect = (item) => {
+  const index = selectedCandidates.value.indexOf(item.id)
+  if (index === -1) {
+    selectedCandidates.value.push(item.id)
+  } else {
+    selectedCandidates.value.splice(index, 1)
+  }
+}
+
+const handleEdit = (item) => {
+  console.log('Edit', item)
+}
+
+const handleDelete = (item) => {
+  console.log('Delete', item)
+}
+
+const handlePrevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const handleNextPage = () => {
+  currentPage.value++
+}
+
+const openAddCandidateModal = () => {
+  showAddCandidateModal.value = true
+}
+
+const closeAddCandidateModal = () => {
+  showAddCandidateModal.value = false
+}
+
+const handleSaveCandidate = (formData) => {
   const newCandidate = {
-    id: 6,
-    fullName: 'Nguyễn Văn 6',
-    email: 'an.nguyen@email.com',
-    phone: '0912345678',
-    campaign: 'IT Recruitment 2024',
-    position: 'Senior Frontend Developer',
-    jobs: 'FE-001',
-    round: 'Technical Interview',
-    review: 'Good',
-    applicationDate: '2024-01-15',
-    source: 'LinkedIn',
-    trainingLevel: 'University',
-    trainingPlace: 'Đại học Bách khoa Hà Nội',
-    major: 'Computer Science',
-    workplace: 'FPT Software',
-    recommendingStaff: 'Trần Thị Bình',
-    department: 'Technology',
-    compatibilityLevel: '85%',
-    area: 'Hà Nội',
-    referral: 'Internal',
-    receiptInfo: 'CV Received',
-    inTalentPool: 'Yes',
-    portalAccount: 'Active',
-    tag: 'JavaScript, Vue.js',
-    status: 'In Progress',
-    sex: 'Male',
-    dateOfBirth: '1995-06-15',
-    address: 'Cầu Giấy, Hà Nội',
-    reason: 'Career Growth',
-    collaborators: 'HR Team',
-    receiptDate: '2024-01-16',
-    jobOfferStatus: 'Pending',
+    id: Date.now(),
+    ...formData,
+    appDate: formData.applicationDate,
+    source: formData.candidateSource,
+    status: 'Pending',
   }
-  candidates.value.push(newCandidate)
-  console.log('Candidate added:', newCandidate)
+
+  candidates.value.unshift(newCandidate)
+  totalRecords.value++
+  console.log('Saved candidate:', newCandidate)
 }
-
-const deleteCandidate = (index) => {
-  //  const indexDelete = candidates.value.findIndex(candidate => candidate.id === index)
-  //c1
-  //  candidates.value.splice(index,1)
-  //c2
-  // candidates.value = candidates.value.filter((c, i) => {
-  //   //lọc những item khác index
-  //   return i !== index
-  // })
-  //c3
-  // candidates.value = candidates.value.slice(0,index).concat(candidates.value.slice(index + 1))
-  //c4
-  candidates.value = [...candidates.value.slice(0,index),...candidates.value.slice(index + 1)]
-}
-
-//search
-const searchQuery = ref('')
-
-//computed để lọc dữ liệu candidates dựa trên searchQuery
-//computed:lắng nghe biến ref, nếu biến đó thay đổi thì sẽ thực hiện call back và trả lại kết quả 
-// const filteredCandidates2 = computed(() => {
-//   // console.log('Filtering candidates with search query:', searchQuery.value)
-
-//   if(!searchQuery.value) {
-//     return candidates.value
-//   }
-//   return candidates.value.filter(c=>{
-//     return c.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
-//   })
-// })
-
-//khi dùng hàm thì nó load lại componet candidate view mỗi lần searchQuery thay đổi, 
-// còn khi dùng computed thì nó sẽ chỉ tính toán lại filteredCandidates2 khi searchQuery
-// thay đổi mà không cần load lại component
-const filteredCandidates2 = ()=>{
-  console.log('Filtering candidates with search query:', searchQuery.value)
-  if(!searchQuery.value) {
-    return candidates.value
-  }
-  
-  return candidates.value.filter(c=>{
-    return c.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
-  })
-}
-
-//watch: lắng nghe biến ref, khi biến đó thay đổi thì sẽ thực hiện call back 
-// nhưng không trả lại kết quả như computed mà nó sẽ thực hiện các tác vụ khác 
-// như gọi API, log ra console,...
-
-//watcheffect: tương tự như watch nhưng nó sẽ tự động chạy callback ngay khi được định nghĩa,
-// và nó cũng sẽ tự động theo dõi tất cả các biến ref được sử dụng trong callback, 
-// khi bất kỳ biến nào trong số đó thay đổi thì callback sẽ được thực hiện lại
-//side effect: tác dụng phụ, nó không ảnh hưởng đến logic chính của component nhưng nó 
-// có thể thực hiện các tác vụ khác như gọi API, log ra console,...
-watchEffect(() => {
-  console.log('Chiều dài: ', candidates.value.length)
-})
-
-
-onMounted(() => {})
 </script>
