@@ -1,14 +1,28 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import './assets/css/commons.css'
-import './assets/css/icons.css'
-import './assets/css/modal-add-candidate.css'
-import './assets/css/style.css'
-import './assets/css/toast.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import './assets/css/fonts.css'
+import '@/assets/css/icons.css'
+import 'devextreme/dist/css/dx.light.css'
+
+// PrimeVue
+import PrimeVue from 'primevue/config'
+import Aura from '@primevue/themes/aura'
+import 'primeicons/primeicons.css'
+import Tooltip from 'primevue/tooltip'
 
 const app = createApp(App)
 
 app.use(router)
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+    options: {
+      darkModeSelector: false
+    }
+  }
+})
+app.directive('tooltip', Tooltip)
 
 app.mount('#app')
