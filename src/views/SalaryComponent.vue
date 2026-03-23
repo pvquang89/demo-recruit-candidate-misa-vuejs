@@ -1,75 +1,63 @@
 <template>
   <div class="salary-page d-flex flex-column overflow-hidden">
-    <!-- Form View -->
-    <SalaryComponentForm
-      v-if="showForm"
-      :mode="formMode"
-      :edit-id="editId"
-      @back="onFormBack"
-      @saved="onFormSaved"
-      @deleted="onFormDeleted"
-    />
-
-    <!-- List View -->
-    <template v-else>
-      <!-- Header Section (nằm ngoài card) -->
-      <div class="salary-header d-flex justify-content-between align-items-center flex-shrink-0">
-        <h1 class="salary-title">Thành phần lương</h1>
-        <div class="salary-toolbar d-flex align-items-center gap-2">
-          <!-- Thiết lập công thức button -->
+    <!-- Header Section (nằm ngoài card) -->
+    <div class="salary-header d-flex justify-content-between align-items-center flex-shrink-0">
+      <h1 class="salary-title">Thành phần lương</h1>
+      <div class="salary-toolbar d-flex align-items-center gap-2">
+        <!-- Thiết lập công thức button -->
+        <MsButton
+          label="Danh mục của hệ thống"
+          icon="icon-mi-rule"
+          variant="outline"
+        />
+        <!-- Thêm mới button -->
+        <div class="btn-group d-flex">
           <MsButton
-            label="Danh mục của hệ thống"
-            icon="icon-mi-rule"
-            variant="outline"
+            label="Thêm mới"
+            icon="icon-mi-plus-white"
+            variant="primary"
+            @click="goToAddForm"
           />
-          <!-- Thêm mới button -->
-          <div class="btn-group d-flex">
-            <MsButton
-              label="Thêm mới"
-              icon="icon-mi-plus-white"
-              variant="primary"
-              @click="goToAddForm"
-            />
-            <MsButton
-              icon="icon-down-white"
-              variant="primary"
-              class="btn-dropdown"
-            />
-          </div>
+          <MsButton
+            icon="icon-down-white"
+            variant="primary"
+            class="btn-dropdown"
+          />
         </div>
       </div>
+    </div>
 
-      <!-- Content Card -->
-      <div class="salary-component d-flex flex-column flex-grow-1 overflow-hidden bg-white rounded-1">
-        <!-- Filter Section - Normal mode -->
-        <div v-if="selectedRows.length === 0" class="salary-filter d-flex align-items-center justify-content-between flex-shrink-0 bg-white">
-          <!-- Search Input -->
-          <div class="filter-search d-flex align-items-center overflow-hidden bg-white rounded-1">
-            <div class="search-icon-wrapper d-flex align-items-center justify-content-center">
-              <span class="icon d-inline-block flex-shrink-0 icon-search"></span>
-            </div>
-            <MsInput
-              v-model="searchText"
-              placeholder="Tìm kiếm"
-              class="search-input-wrapper"
-            />
+    <!-- Content Card -->
+    <div class="salary-component d-flex flex-column flex-grow-1 overflow-hidden bg-white rounded-1">
+      <!-- Filter Section - Normal mode -->
+      <div v-if="selectedRows.length === 0" class="salary-filter d-flex align-items-center justify-content-between flex-shrink-0 bg-white">
+        <!-- Search Input -->
+        <div class="filter-search d-flex align-items-center overflow-hidden bg-white rounded-1">
+          <div class="search-icon-wrapper d-flex align-items-center justify-content-center">
+            <span class="icon d-inline-block flex-shrink-0 icon-search"></span>
           </div>
+          <MsInput
+            v-model="searchText"
+            placeholder="Tìm kiếm"
+            class="search-input-wrapper"
+          />
+        </div>
 
-          <!-- Filter Controls -->
-          <div class="filter-controls d-flex align-items-center gap-2">
-            <!-- Tất cả trạng thái -->
-            <MsSelect
-              v-model="selectedStatus"
-              :options="statusOptions"
-              placeholder="Tất cả trạng thái"
-              size="small"
-              class="filter-status-select"
-            />
+        <!-- Filter Controls -->
+        <div class="filter-controls d-flex align-items-center gap-2">
+          <!-- Tất cả trạng thái -->
+          <MsSelect
+            v-model="selectedStatus"
+            :options="statusOptions"
+            placeholder="Tất cả trạng thái"
+            size="small"
+            class="filter-status-select"
+          />
 
-            <!-- Tất cả đơn vị -->
-            <MsTree
-              v-model="selectedUnits"
-              :data-source="unitTreeData"
+          <!-- Tất cả đơn vị -->
+          <MsTree
+            v-model="selectedUnits"
+            :data-source="unitTreeData"
             key-expr="id"
             display-expr="name"
             placeholder="Tất cả đơn vị"
@@ -131,7 +119,6 @@
 
       <!-- Table Section - Using BaseDataGrid -->
       <BaseDataGrid
-        ref="dataGridRef"
         :data-source="salaryComponents"
         :columns="tableColumns"
         key-expr="id"
@@ -141,63 +128,24 @@
         :page-size-options="pageSizeSelectOptions"
         @selection-changed="onSelectionChanged"
         @action="onAction"
-      >
-        <!-- Status column template -->
-        <template #statusTemplate="{ data }">
-          <div class="status-cell">
-            <div class="status-indicator" :class="data.data.status === 'Đang theo dõi' ? 'active' : 'inactive'"></div>
-            <span class="status-text" :class="data.data.status === 'Đang theo dõi' ? 'active' : 'inactive'">
-              {{ data.data.status }}
-            </span>
-          </div>
-        </template>
-      </BaseDataGrid>
+      />
     </div>
-    </template>
   </div>
-
-  <!-- Delete Confirmation Dialog -->
-  <MsConfirmDialog
-    v-model="showDeleteDialog"
-    title="Thông báo"
-    :message="`Bạn có chắc chắn muốn xóa thành phần lương <strong>${deleteTarget?.name || ''}</strong> không?`"
-    confirm-text="Xóa"
-    cancel-text="Hủy"
-    confirm-variant="danger"
-    :loading="isDeleting"
-    @confirm="confirmDelete"
-  />
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
-import BaseDataGrid from '@/components/bases/data/BaseDataGrid.vue'
-import MsTree from '@/components/bases/data/MsTree.vue'
-import MsButton from '@/components/bases/ui/MsButton.vue'
-import MsInput from '@/components/bases/form/MsInput.vue'
-import MsSelect from '@/components/bases/form/MsSelect.vue'
-import MsConfirmDialog from '@/components/bases/ui/MsConfirmDialog.vue'
-import SalaryComponentForm from '@/views/SalaryComponentForm.vue'
-import salaryCompositionApi from '@/api/salary-composition.api'
-import { useOrganization, useToast } from '@/composables'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import BaseDataGrid from '@/components/bases/BaseDataGrid.vue'
+import MsButton from '@/components/bases/MsButton.vue'
+import MsInput from '@/components/bases/MsInput.vue'
+import MsSelect from '@/components/bases/MsSelect.vue'
+import MsTree from '@/components/bases/MsTree.vue'
 
-const { tree: unitTreeData, fetchTree, flatList: orgFlatList } = useOrganization()
-const toast = useToast()
-
-// Form toggle state
-const showForm = ref(false)
-const formMode = ref('add')
-const editId = ref(null)
+const router = useRouter()
 
 const searchText = ref('')
 const selectedRows = ref([])
-const loading = ref(false)
-const dataGridRef = ref(null)
-
-// Delete confirmation dialog state
-const showDeleteDialog = ref(false)
-const deleteTarget = ref(null)
-const isDeleting = ref(false)
 
 // Filter state
 const selectedStatus = ref(null)
@@ -209,22 +157,54 @@ const statusOptions = [
   { value: 'inactive', label: 'Ngừng theo dõi' }
 ]
 
+const unitTreeData = [
+  {
+    id: 1,
+    name: 'Misa Test pdthien 2024',
+    items: [
+      {
+        id: 11,
+        name: 'Chi nhánh miền Bắc',
+        items: [
+          {
+            id: 111,
+            name: 'Khối sản xuất',
+            items: [
+              { id: 1111, name: 'Dự án Core' },
+              { id: 1112, name: 'Dự án C&B' }
+            ]
+          },
+          { id: 112, name: 'Trung tâm kinh doanh' },
+          { id: 113, name: 'Trung tâm hỗ trợ khách hàng' }
+        ]
+      },
+      {
+        id: 12,
+        name: 'Chi nhánh miền Nam',
+        items: [
+          { id: 121, name: 'Trung tâm kinh doanh' }
+        ]
+      }
+    ]
+  }
+]
+
 // Table columns configuration
 const tableColumns = [
-  { dataField: 'code', caption: 'Mã thành phần', width: 250, minWidth: 120 },
+  { dataField: 'code', caption: 'Mã thành phần', width: 150, minWidth: 120 },
   { dataField: 'name', caption: 'Tên thành phần', width: 250, minWidth: 200 },
-  { dataField: 'unit', caption: 'Đơn vị áp dụng', width: 250, minWidth: 120 },
-  { dataField: 'type', caption: 'Loại thành phần', width: 250, minWidth: 120 },
-  { dataField: 'property', caption: 'Tính chất', width: 150, minWidth: 100 },
-  { dataField: 'taxable', caption: 'Chịu thuế', width: 200, minWidth: 100 },
+  { dataField: 'unit', caption: 'Đơn vị áp dụng', width: 150, minWidth: 120 },
+  { dataField: 'type', caption: 'Loại thành phần', width: 150, minWidth: 120 },
+  { dataField: 'property', caption: 'Tính chất', width: 120, minWidth: 100 },
+  { dataField: 'taxable', caption: 'Chịu thuế', width: 100, minWidth: 80 },
   { dataField: 'taxDeduction', caption: 'Giảm trừ khi tính thuế', width: 180, minWidth: 150 },
   { dataField: 'quota', caption: 'Định mức', width: 120, minWidth: 100 },
   { dataField: 'valueType', caption: 'Kiểu giá trị', width: 120, minWidth: 100 },
   { dataField: 'value', caption: 'Giá trị', width: 120, minWidth: 100 },
   { dataField: 'description', caption: 'Mô tả', width: 200, minWidth: 150 },
-  { dataField: 'showOnPayslip', caption: 'Hiển thị trên phiếu lương', width: 200, minWidth: 150 },
+  { dataField: 'showOnPayslip', caption: 'Hiển thị trên phiếu lương', width: 180, minWidth: 150 },
   { dataField: 'source', caption: 'Nguồn tạo', width: 120, minWidth: 100 },
-  { dataField: 'status', caption: 'Trạng thái', width: 150, minWidth: 120, cellTemplate: 'statusTemplate' }
+  { dataField: 'status', caption: 'Trạng thái', width: 120, minWidth: 100 }
 ]
 
 // Pagination state
@@ -239,169 +219,72 @@ const pageSizeSelectOptions = [
   { value: 100, label: '100' }
 ]
 
-const salaryComponents = ref([])
-
-// Map loại thành phần
-const typeMap = {
-  employee_info: 'Thông tin nhân viên',
-  attendance: 'Chấm công',
-  revenue: 'Doanh số',
-  kpi: 'KPI',
-  product: 'Sản phẩm',
-  salary: 'Lương',
-  pit: 'Thuế TNCN',
-  insurance_union: 'Bảo hiểm - Công đoàn',
-  other: 'Khác'
-}
-
-// Map tính chất
-const propertyMap = {
-  income: 'Thu nhập',
-  deduction: 'Khấu trừ',
-  other: 'Khác'
-}
-
-// Map tùy chọn thuế
-const taxOptionMap = {
-  taxable: 'Chịu thuế',
-  tax_exempt_full: 'Miễn thuế toàn phần',
-  tax_exempt_partial: 'Miễn thuế một phần'
-}
-
-// Map hiển thị trên phiếu lương
-const showOnPayslipMap = {
-  yes: 'Có',
-  no: 'Không',
-  if_not_zero: 'Chỉ hiển thị nếu giá trị khác 0'
-}
-
-// Map nguồn tạo
-const sourceMap = {
-  manual: 'Tự thêm',
-  system: 'Hệ thống'
-}
-
-// Map trạng thái
-const statusMap = {
-  1: 'Đang theo dõi',
-  0: 'Ngừng theo dõi'
-}
-
-// Map kiểu giá trị
-const valueTypeMap = {
-  number: 'Số',
-  currency: 'Tiền tệ',
-  percent: 'Phần trăm',
-  text: 'Chữ',
-  date: 'Ngày'
-}
-
-// Hàm lấy tên đơn vị hiển thị theo kiểu MsTree
-const getUnitDisplayNames = (unitIds) => {
-  if (!unitIds || unitIds.length === 0 || !orgFlatList.value?.length) {
-    return ''
+const salaryComponents = ref([
+  {
+    id: 1,
+    code: 'TPL001',
+    name: 'Lương cơ bản',
+    unit: 'Tất cả',
+    type: 'Thu nhập',
+    property: 'Chịu thuế'
+  },
+  {
+    id: 2,
+    code: 'TPL002',
+    name: 'Phụ cấp ăn trưa',
+    unit: 'Tất cả',
+    type: 'Thu nhập',
+    property: 'Không chịu thuế'
+  },
+  {
+    id: 3,
+    code: 'TPL003',
+    name: 'Phụ cấp đi lại',
+    unit: 'Tất cả',
+    type: 'Thu nhập',
+    property: 'Không chịu thuế'
+  },
+  {
+    id: 4,
+    code: 'TPL004',
+    name: 'Tổng giờ làm thêm hưởng lương không chịu thuế',
+    unit: 'Tất cả',
+    type: 'Thu nhập',
+    property: 'Không chịu thuế'
+  },
+  {
+    id: 5,
+    code: 'TPL005',
+    name: 'Tổng giờ làm thêm hưởng lương chịu thuế',
+    unit: 'Tất cả',
+    type: 'Thu nhập',
+    property: 'Chịu thuế'
+  },
+  {
+    id: 6,
+    code: 'TPL006',
+    name: 'Bảo hiểm xã hội',
+    unit: 'Tất cả',
+    type: 'Giảm trừ',
+    property: 'Giảm trừ'
+  },
+  {
+    id: 7,
+    code: 'TPL007',
+    name: 'Bảo hiểm y tế',
+    unit: 'Tất cả',
+    type: 'Giảm trừ',
+    property: 'Giảm trừ'
+  },
+  {
+    id: 8,
+    code: 'TPL008',
+    name: 'Thuế thu nhập cá nhân',
+    unit: 'Tất cả',
+    type: 'Giảm trừ',
+    property: 'Giảm trừ'
   }
-
-  const ids = new Set(unitIds.map(x => String(x)))
-  const byId = new Map()
-  const childrenByParent = new Map()
-
-  for (const raw of orgFlatList.value) {
-    const idStr = String(raw.id)
-    const parentIdStr = raw.parentId == null ? null : String(raw.parentId)
-    const nameStr = String(raw.name ?? '')
-    byId.set(idStr, { id: idStr, name: nameStr, parentId: parentIdStr })
-    if (!childrenByParent.has(parentIdStr)) childrenByParent.set(parentIdStr, [])
-    childrenByParent.get(parentIdStr).push(idStr)
-  }
-
-  // Tìm các cha mà tất cả con đều được chọn
-  const parentsToDisplay = new Set()
-  childrenByParent.forEach((childIds, parentId) => {
-    if (parentId == null) return
-    if (!childIds || childIds.length === 0) return
-    const parentSelected = ids.has(parentId)
-    const allChildrenSelected = childIds.every((cid) => ids.has(cid))
-    if (parentSelected || allChildrenSelected) parentsToDisplay.add(parentId)
-  })
-
-  // Kiểm tra tổ tiên
-  function hasAncestorInSet(nodeId, set) {
-    let cur = byId.get(nodeId)
-    while (cur && cur.parentId != null) {
-      if (set.has(cur.parentId)) return true
-      cur = byId.get(cur.parentId)
-    }
-    return false
-  }
-
-  // Lấy các cha cao nhất (không có tổ tiên trong set)
-  const effectiveParents = new Set()
-  parentsToDisplay.forEach((pid) => {
-    if (!hasAncestorInSet(pid, parentsToDisplay)) effectiveParents.add(pid)
-  })
-
-  // Kiểm tra node có được bao phủ bởi cha không
-  function isCoveredByDisplayedParent(nodeId) {
-    let cur = byId.get(nodeId)
-    while (cur && cur.parentId != null) {
-      if (effectiveParents.has(cur.parentId)) return true
-      cur = byId.get(cur.parentId)
-    }
-    return false
-  }
-
-  // Tập hợp các id cần hiển thị
-  const displayIds = new Set()
-  effectiveParents.forEach((pid) => displayIds.add(pid))
-  ids.forEach((sid) => {
-    if (!isCoveredByDisplayedParent(sid) && !displayIds.has(sid)) displayIds.add(sid)
-  })
-
-  // Lấy tên theo thứ tự trong flatList
-  const result = []
-  for (const raw of orgFlatList.value) {
-    const idStr = String(raw.id)
-    if (displayIds.has(idStr)) result.push(String(raw.name ?? ''))
-  }
-  return result.join(', ')
-}
-
-const mapDataForDisplay = (data) => {
-  return data.map(item => ({
-    ...item,
-    unit: getUnitDisplayNames(item.unitIds),
-    type: typeMap[item.type] || item.type,
-    property: propertyMap[item.property] || item.property,
-    taxable: taxOptionMap[item.taxOption] || item.taxOption || '',
-    taxDeduction: item.deductWhenCalculatingTax ? 'Có' : 'Không',
-    quota: item.quota || '',
-    valueType: valueTypeMap[item.valueType] || item.valueType || '',
-    value: item.valueFormula || '',
-    description: item.description || '',
-    showOnPayslip: showOnPayslipMap[item.showOnPayslip] || item.showOnPayslip || '',
-    source: sourceMap[item.source] || item.source || '',
-    status: statusMap[item.status] ?? item.status
-  }))
-}
-
-const fetchSalaryComponents = async () => {
-  loading.value = true
-  try {
-    const data = await salaryCompositionApi.getAll()
-    salaryComponents.value = mapDataForDisplay(data)
-    totalRecords.value = data.length
-  } catch (error) {
-    console.error('Error fetching salary components:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(async () => {
-  await fetchTree()
-  await fetchSalaryComponents()
-})
+])
 
 const onSelectionChanged = (rows) => {
   selectedRows.value = rows
@@ -410,7 +293,6 @@ const onSelectionChanged = (rows) => {
 
 const clearSelection = () => {
   selectedRows.value = []
-  dataGridRef.value?.clearSelection()
 }
 
 const onBulkStop = () => {
@@ -421,81 +303,16 @@ const onBulkActive = () => {
   console.log('Bulk active:', selectedRows.value)
 }
 
-const onBulkDelete = async () => {
-  if (selectedRows.value.length === 0) return
-
-  try {
-    const deletePromises = selectedRows.value.map(row => salaryCompositionApi.delete(row.id))
-    await Promise.all(deletePromises)
-    toast.success('Xóa thành công')
-    clearSelection()
-    await fetchSalaryComponents()
-  } catch (error) {
-    console.error('Error deleting salary components:', error)
-    toast.error('Có lỗi xảy ra')
-  }
+const onBulkDelete = () => {
+  console.log('Bulk delete:', selectedRows.value)
 }
 
-const onAction = async ({ action, data }) => {
-  if (action === 'edit') {
-    formMode.value = 'edit'
-    editId.value = data.id
-    showForm.value = true
-  } else if (action === 'duplicate') {
-    formMode.value = 'duplicate'
-    editId.value = data.id
-    showForm.value = true
-  } else if (action === 'delete') {
-    deleteTarget.value = data
-    showDeleteDialog.value = true
-  }
-}
-
-const confirmDelete = async () => {
-  if (!deleteTarget.value) return
-  
-  isDeleting.value = true
-  try {
-    await salaryCompositionApi.delete(deleteTarget.value.id)
-    toast.success('Xóa thành công')
-    showDeleteDialog.value = false
-    deleteTarget.value = null
-    await fetchSalaryComponents()
-  } catch (error) {
-    console.error('Error deleting salary component:', error)
-    toast.error('Có lỗi xảy ra')
-  } finally {
-    isDeleting.value = false
-  }
+const onAction = ({ action, data }) => {
+  console.log('Action:', action, 'Data:', data)
 }
 
 const goToAddForm = () => {
-  formMode.value = 'add'
-  editId.value = null
-  showForm.value = true
-}
-
-const onFormBack = async (payload) => {
-  if (payload?.action === 'duplicate') {
-    // Force remount form by hiding then showing
-    showForm.value = false
-    await nextTick()
-    formMode.value = 'duplicate'
-    editId.value = payload.id
-    showForm.value = true
-  } else {
-    showForm.value = false
-    formMode.value = 'add'
-    editId.value = null
-  }
-}
-
-const onFormSaved = async () => {
-  await fetchSalaryComponents()
-}
-
-const onFormDeleted = async () => {
-  await fetchSalaryComponents()
+  router.push({ name: 'salary-component-add' })
 }
 </script>
 
@@ -541,13 +358,13 @@ const onFormDeleted = async () => {
 
 /* Filter Section */
 .salary-filter {
-  padding: 16px 16px 12px 16px;
-  height: 64px;
+  padding: 12px 20px;
+  height: 61px;
 }
 
 /* Search Input */
 .filter-search {
-  width: 240px;
+  width: 300px;
   height: 36px;
   border: 1px solid #e0e0e0;
 }
@@ -607,8 +424,8 @@ const onFormDeleted = async () => {
 
 /* Selection Toolbar */
 .selection-toolbar {
-  padding: 16px 16px 12px 16px;
-  height: 64px;
+  padding: 12px 20px;
+  height: 61px;
 }
 
 .selection-info {

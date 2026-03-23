@@ -68,7 +68,7 @@
 import { ref, computed, watch } from 'vue'
 import DxDropDownBox from 'devextreme-vue/drop-down-box'
 import DxTreeView from 'devextreme-vue/tree-view'
-import MsInput from '@/components/bases/form/MsInput.vue'
+import MsInput from '@/components/bases/MsInput.vue'
 
 const props = defineProps({
   modelValue: {
@@ -342,13 +342,6 @@ function onValueChanged(e) {
 </script>
 
 <style>
-/* Force DevExtreme component height */
-.ms-tree.dx-dropdownbox,
-.ms-tree.dx-texteditor {
-  height: 34px !important;
-  min-height: 34px !important;
-}
-
 /* DevExtreme TreeView toggle icon */
 .dx-treeview-toggle-item-visibility {
   mask-image: url('@/assets/icons/Icon1.svg');
@@ -377,10 +370,6 @@ function onValueChanged(e) {
   flex: 1;
   display: flex !important;
   align-items: center;
-}
-
-.ms-tree .dx-texteditor-container {
-  height: 32px !important;
 }
 
 /* Hide default DevExtreme input and placeholder */
@@ -483,12 +472,10 @@ function onValueChanged(e) {
   bottom: 0;
   display: flex;
   align-items: center;
-  padding: 0 34px 0 8px;
+  padding: 4px 34px 4px 8px;
   cursor: pointer;
   background: transparent;
   z-index: 1;
-  height: 34px;
-  line-height: 34px;
 }
 
 .ms-tree-disabled {
@@ -498,9 +485,7 @@ function onValueChanged(e) {
 
 :deep(.ms-tree) {
   width: 350px;
-  height: 34px !important;
-  min-height: 34px !important;
-  max-height: 34px !important;
+  min-height: 34px;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
   border: 1px solid #e0e0e0;
@@ -510,11 +495,6 @@ function onValueChanged(e) {
 
 :deep(.ms-tree .dx-dropdowneditor-input-wrapper) {
   flex: 1;
-  height: 32px !important;
-}
-
-:deep(.ms-tree .dx-texteditor-container) {
-  height: 32px !important;
 }
 
 .ms-tree-wrapper:hover :deep(.ms-tree:not(.dx-state-disabled)) {

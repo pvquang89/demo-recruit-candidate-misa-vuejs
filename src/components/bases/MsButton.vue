@@ -183,14 +183,14 @@ const onClick = (event) => {
 
 /* Variant: Danger */
 .ms-btn-danger {
-  background: #e61d1d;
-  border-color: #e61d1d;
+  background: #ff6161;
+  border-color: #ff6161;
   color: #fff;
 }
 
 .ms-btn-danger:hover:not(:disabled) {
-  background: #d81010;
-  border-color: #d81010;
+  background: #e55656;
+  border-color: #e55656;
 }
 
 .ms-btn-danger:active:not(:disabled) {

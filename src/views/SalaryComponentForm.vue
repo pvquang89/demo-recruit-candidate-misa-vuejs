@@ -11,37 +11,18 @@
           @click="goBack"
           title="Quay lại"
         />
-        <h2 class="form-title" :title="isEdit ? formData.name : ''">{{ isEdit ? formData.name : 'Thêm thành phần' }}</h2>
+        <h2 class="form-title">{{ isEdit ? 'Sửa thành phần' : 'Thêm thành phần' }}</h2>
       </div>
       <div class="header-right">
         <MsButton label="Hủy bỏ" variant="outline" @click="handleCancel" />
         <MsButton label="Lưu và thêm" variant="outline" @click="handleSaveAndAdd" v-if="!isEdit" />
         <MsButton label="Lưu" variant="primary" @click="handleSave" />
-        <div v-if="isEdit" class="more-dropdown-wrapper">
-          <MsButton
-            icon="icon-mi-threedot"
-            variant="outline"
-            class="btn-more"
-            title="Chức năng khác"
-            @click="toggleMoreMenu"
-          />
-          <ul v-show="showMoreMenu" class="more-dropdown-menu">
-            <li class="more-dropdown-item" @click="handleDuplicate">
-              <span class="icon icon-mi-copy"></span>
-              <span class="item-text">Nhân bản</span>
-            </li>
-            <li class="more-dropdown-item" @click="handleDelete">
-              <span class="icon icon-mi-trash-red"></span>
-              <span class="item-text text-red">Xóa</span>
-            </li>
-          </ul>
-        </div>
       </div>
     </div>
 
     <!-- Form Content -->
     <div class="form-content">
-      <div class="form-body" ref="formBodyRef" @keydown.enter="focusNextInput">
+      <div class="form-body">
         <!-- Row 1: Tên thành phần -->
         <div class="form-row">
           <label class="form-label-left required"><b>Tên thành phần</b></label>
@@ -51,8 +32,6 @@
               class="w-full"
               :maxlength="255"
               :autofocus="true"
-              :has-error="!!formErrors.name"
-              :error-message="formErrors.name"
             />
           </div>
         </div>
@@ -66,10 +45,6 @@
               class="w-full"
               placeholder="Nhập mã viết liền"
               :maxlength="255"
-              :disabled="isEdit"
-              :has-error="!!formErrors.code"
-              :error-message="formErrors.code"
-              @input="onCodeInput"
             />
           </div>
         </div>
@@ -97,10 +72,8 @@
             <MsSelect
               v-model="formData.type"
               :options="componentTypes"
-              placeholder=""
+              placeholder="Chọn loại thành phần"
               size="medium"
-              :has-error="!!formErrors.type"
-              :error-message="formErrors.type"
             />
           </div>
         </div>
@@ -114,8 +87,6 @@
               :options="properties"
               placeholder="Chọn tính chất"
               size="medium"
-              :has-error="!!formErrors.property"
-              :error-message="formErrors.property"
             />
             <!-- Thu nhập: 3 radio buttons -->
             <div class="tax-options" v-if="formData.property === 'income'">
@@ -261,239 +232,73 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
-import MsInput from '@/components/bases/form/MsInput.vue'
-import MsTextarea from '@/components/bases/form/MsTextarea.vue'
-import MsSelect from '@/components/bases/form/MsSelect.vue'
-import MsRadioButton from '@/components/bases/form/MsRadioButton.vue'
-import MsCheckbox from '@/components/bases/form/MsCheckbox.vue'
-import MsTree from '@/components/bases/data/MsTree.vue'
-import MsButton from '@/components/bases/ui/MsButton.vue'
-import { useSalaryComposition, useOrganization, useToast } from '@/composables'
+import { ref, reactive, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import MsInput from '@/components/bases/MsInput.vue'
+import MsTextarea from '@/components/bases/MsTextarea.vue'
+import MsSelect from '@/components/bases/MsSelect.vue'
+import MsTree from '@/components/bases/MsTree.vue'
+import MsRadioButton from '@/components/bases/MsRadioButton.vue'
+import MsCheckbox from '@/components/bases/MsCheckbox.vue'
+import MsButton from '@/components/bases/MsButton.vue'
 
-const props = defineProps({
-  mode: {
-    type: String,
-    default: 'add',
-    validator: (value) => ['add', 'edit', 'duplicate'].includes(value)
-  },
-  editId: {
-    type: [String, Number],
-    default: null
-  }
-})
+const router = useRouter()
+const route = useRoute()
 
-const emit = defineEmits(['back', 'saved', 'deleted'])
+const isEdit = computed(() => !!route.params.id)
 
-const {
-  form: formData,
-  fetchById,
-  save,
-  saveAndNew,
-  remove,
-  resetForm
-} = useSalaryComposition()
-
-const { tree: unitTreeData, fetchTree } = useOrganization()
-
-const toast = useToast()
-
-const isEdit = computed(() => props.mode === 'edit')
-const isDuplicate = computed(() => props.mode === 'duplicate')
-
-const isCodeManuallyEdited = ref(false)
-const showMoreMenu = ref(false)
-const formBodyRef = ref(null)
-
-const focusNextInput = (e) => {
-  if (e.target.tagName === 'TEXTAREA') return
-  
-  e.preventDefault()
-  const focusableElements = formBodyRef.value?.querySelectorAll(
-    'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])'
-  )
-  if (!focusableElements) return
-  
-  const currentIndex = Array.from(focusableElements).indexOf(e.target)
-  if (currentIndex !== -1 && currentIndex < focusableElements.length - 1) {
-    focusableElements[currentIndex + 1].focus()
-  }
-}
-
-const toggleMoreMenu = () => {
-  showMoreMenu.value = !showMoreMenu.value
-}
-
-const closeMoreMenu = (e) => {
-  if (!e.target.closest('.more-dropdown-wrapper')) {
-    showMoreMenu.value = false
-  }
-}
-
-const goBack = () => {
-  emit('back')
-}
-
-const handleDuplicate = () => {
-  showMoreMenu.value = false
-  emit('back', { action: 'duplicate', id: props.editId })
-}
-
-const handleDelete = async () => {
-  showMoreMenu.value = false
-  if (!props.editId) return
-
-  try {
-    await remove(props.editId)
-    toast.success('Xóa thành công')
-    emit('deleted')
-    emit('back')
-  } catch (error) {
-    console.error('Error deleting salary component:', error)
-    toast.error('Có lỗi xảy ra')
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', closeMoreMenu)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', closeMoreMenu)
-})
-
-const removeVietnameseDiacritics = (str) => {
-  const diacriticsMap = {
-    'à': 'a', 'á': 'a', 'ả': 'a', 'ã': 'a', 'ạ': 'a',
-    'ă': 'a', 'ằ': 'a', 'ắ': 'a', 'ẳ': 'a', 'ẵ': 'a', 'ặ': 'a',
-    'â': 'a', 'ầ': 'a', 'ấ': 'a', 'ẩ': 'a', 'ẫ': 'a', 'ậ': 'a',
-    'đ': 'd',
-    'è': 'e', 'é': 'e', 'ẻ': 'e', 'ẽ': 'e', 'ẹ': 'e',
-    'ê': 'e', 'ề': 'e', 'ế': 'e', 'ể': 'e', 'ễ': 'e', 'ệ': 'e',
-    'ì': 'i', 'í': 'i', 'ỉ': 'i', 'ĩ': 'i', 'ị': 'i',
-    'ò': 'o', 'ó': 'o', 'ỏ': 'o', 'õ': 'o', 'ọ': 'o',
-    'ô': 'o', 'ồ': 'o', 'ố': 'o', 'ổ': 'o', 'ỗ': 'o', 'ộ': 'o',
-    'ơ': 'o', 'ờ': 'o', 'ớ': 'o', 'ở': 'o', 'ỡ': 'o', 'ợ': 'o',
-    'ù': 'u', 'ú': 'u', 'ủ': 'u', 'ũ': 'u', 'ụ': 'u',
-    'ư': 'u', 'ừ': 'u', 'ứ': 'u', 'ử': 'u', 'ữ': 'u', 'ự': 'u',
-    'ỳ': 'y', 'ý': 'y', 'ỷ': 'y', 'ỹ': 'y', 'ỵ': 'y'
-  }
-
-  return str
-    .toLowerCase()
-    .split('')
-    .map(char => diacriticsMap[char] || char)
-    .join('')
-}
-
-const generateCodeFromName = (name) => {
-  if (!name) return ''
-
-  return removeVietnameseDiacritics(name)
-    .toUpperCase()
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/[^A-Z0-9_]/g, '')
-}
-
-watch(() => formData.name, (newName) => {
-  if (!isEdit.value && !isCodeManuallyEdited.value) {
-    formData.code = generateCodeFromName(newName)
-  }
-})
-
-const onCodeInput = () => {
-  isCodeManuallyEdited.value = true
-  validateCodeRealtime()
-}
-
-const hasVietnameseDiacritics = (str) => {
-  const diacriticsPattern = /[àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]/i
-  return diacriticsPattern.test(str)
-}
-
-const hasInvalidCharacters = (str) => {
-  const validPattern = /^[A-Za-z0-9_]*$/
-  return !validPattern.test(str)
-}
-
-const validateCodeRealtime = () => {
-  if (!formData.code) {
-    formErrors.code = ''
-    return
-  }
-
-  if (formData.code.includes(' ')) {
-    formErrors.code = 'Mã thành phần không được chứa khoảng trắng.'
-  } else if (hasVietnameseDiacritics(formData.code) || hasInvalidCharacters(formData.code)) {
-    formErrors.code = 'Mã thành phần chỉ có thể chứa các kí tự chữ (A-Z a-z), số (0-9) và gạch dưới (_).'
-  } else {
-    formErrors.code = ''
-  }
-}
-
-const formErrors = reactive({
-  name: '',
+const formData = reactive({
   code: '',
+  name: '',
+  unitIds: [],
   type: '',
-  property: ''
+  property: 'income',
+  taxOption: 'taxable',
+  deductWhenCalculatingTax: false,
+  quota: '',
+  allowExceedQuota: false,
+  valueType: 'currency',
+  valueCalculation: 'formula',
+  sumScope: 'same_unit',
+  orgLevel: 'level_4',
+  salaryComponentToSum: '',
+  valueFormula: '',
+  description: '',
+  showOnPayslip: 'yes',
+  source: 'manual'
 })
 
-const clearErrors = () => {
-  formErrors.name = ''
-  formErrors.code = ''
-  formErrors.type = ''
-  formErrors.property = ''
-}
-
-const validateForm = () => {
-  clearErrors()
-  let isValid = true
-
-  if (!formData.name?.trim()) {
-    formErrors.name = 'Không được để trống'
-    isValid = false
+const unitTreeData = [
+  {
+    id: 1,
+    name: 'Misa Test pdthien 2024',
+    items: [
+      {
+        id: 11,
+        name: 'Chi nhánh miền Bắc',
+        items: [
+          {
+            id: 111,
+            name: 'Khối sản xuất',
+            items: [
+              { id: 1111, name: 'Dự án Core' },
+              { id: 1112, name: 'Dự án C&B' }
+            ]
+          },
+          { id: 112, name: 'Trung tâm kinh doanh' },
+          { id: 113, name: 'Trung tâm hỗ trợ khách hàng' }
+        ]
+      },
+      {
+        id: 12,
+        name: 'Chi nhánh miền Nam',
+        items: [
+          { id: 121, name: 'Trung tâm kinh doanh' }
+        ]
+      }
+    ]
   }
-
-  if (!formData.code?.trim()) {
-    formErrors.code = 'Không được để trống'
-    isValid = false
-  } else if (formData.code.includes(' ')) {
-    formErrors.code = 'Mã thành phần không được chứa khoảng trắng.'
-    isValid = false
-  } else if (hasVietnameseDiacritics(formData.code) || hasInvalidCharacters(formData.code)) {
-    formErrors.code = 'Mã thành phần chỉ có thể chứa các kí tự chữ (A-Z a-z), số (0-9) và gạch dưới (_).'
-    isValid = false
-  } else {
-    formData.code = formData.code.toUpperCase()
-  }
-
-  if (!formData.type) {
-    formErrors.type = 'Không được để trống'
-    isValid = false
-  }
-
-  if (!formData.property) {
-    formErrors.property = 'Không được để trống'
-    isValid = false
-  }
-
-  return isValid
-}
-
-onMounted(async () => {
-  await fetchTree()
-  if (isEdit.value && props.editId) {
-    await fetchById(props.editId)
-  } else if (isDuplicate.value && props.editId) {
-    await fetchById(props.editId)
-    formData.code = ''
-    formData.name = ''
-    isCodeManuallyEdited.value = false
-  } else {
-    resetForm()
-  }
-})
+]
 
 const componentTypes = ref([
   { value: 'employee_info', label: 'Thông tin nhân viên' },
@@ -552,45 +357,47 @@ const getSourceLabel = computed(() => {
   return source ? source.label : 'Tự thêm'
 })
 
+const goBack = () => {
+  router.back()
+}
+
 const handleCancel = () => {
-  goBack()
+  router.back()
 }
 
-const handleSave = async () => {
-  if (!validateForm()) {
-    return
-  }
-
-  try {
-    await save(isEdit.value ? props.editId : null)
-    toast.success(isEdit.value ? 'Cập nhật thành phần lương thành công' : 'Thêm thành công')
-    emit('saved')
-    goBack()
-  } catch (err) {
-    console.error('Save error:', err)
-    toast.error('Có lỗi xảy ra')
-  }
+const handleSave = () => {
+  console.log('Save:', formData)
 }
 
-const handleSaveAndAdd = async () => {
-  if (!validateForm()) {
-    return
-  }
-
-  try {
-    await saveAndNew()
-    toast.success('Thêm thành công')
-    clearErrors()
-  } catch (err) {
-    console.error('Save error:', err)
-    toast.error('Có lỗi xảy ra')
-  }
+const handleSaveAndAdd = () => {
+  console.log('Save and add:', formData)
+  Object.assign(formData, {
+    code: '',
+    name: '',
+    unitIds: [],
+    type: '',
+    property: 'income',
+    taxOption: 'taxable',
+    deductWhenCalculatingTax: false,
+    quota: '',
+    allowExceedQuota: false,
+    valueType: 'currency',
+    valueCalculation: 'formula',
+    sumScope: 'same_unit',
+    orgLevel: 'level_4',
+    salaryComponentToSum: '',
+    valueFormula: '',
+    description: '',
+    showOnPayslip: 'yes',
+    source: 'manual'
+  })
 }
 </script>
 
 <style scoped>
 /* Page Container */
 .salary-form-page {
+  padding: 16px 24px;
   height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
@@ -633,66 +440,6 @@ const handleSaveAndAdd = async () => {
   letter-spacing: 0.384px;
   line-height: 30px;
   margin: 0;
-  max-width: 400px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* More Button */
-.btn-more {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  padding: 0;
-}
-
-/* More Dropdown */
-.more-dropdown-wrapper {
-  position: relative;
-}
-
-.more-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 4px;
-  background: #fff;
-  border-radius: 5px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  padding: 8px 6px;
-  list-style: none;
-  min-width: 140px;
-  z-index: 1000;
-}
-
-.more-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  line-height: 35px;
-}
-
-.more-dropdown-item:hover {
-  background: #f2f2f2;
-}
-
-.more-dropdown-item .icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.more-dropdown-item .item-text {
-  font-size: 14px;
-  color: #212121;
-}
-
-.more-dropdown-item .item-text.text-red {
-  color: #ff6161;
 }
 
 /* Form Content */
@@ -745,7 +492,6 @@ const handleSaveAndAdd = async () => {
 .form-input-right {
   flex: 1;
   max-width: 1104px;
-  line-height: normal;
 }
 
 /* Input wrapper max-width */
@@ -840,9 +586,17 @@ const handleSaveAndAdd = async () => {
 
 .form-unit-tree :deep(.ms-tree-wrapper) {
   width: 100%;
+  display: flex;
+  height: 34px;
 }
 
 .form-unit-tree :deep(.ms-tree) {
   width: 100%;
+  height: 34px;
+  min-height: 34px;
+}
+
+.form-unit-tree :deep(.ms-tree-display) {
+  line-height: 1;
 }
 </style>

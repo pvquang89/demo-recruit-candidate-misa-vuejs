@@ -168,7 +168,7 @@ const onFocus = (event) => {
 }
 
 .ms-select-disabled :deep(.ms-select) {
-  background-color: #e8eaef;
+  background-color: #f5f5f5;
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -176,6 +176,7 @@ const onFocus = (event) => {
 .ms-select-error-message {
   font-size: 12px;
   color: #ff6161;
+  margin-top: 4px;
 }
 </style>
 

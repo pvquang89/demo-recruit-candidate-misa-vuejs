@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import TheHeader from './layouts/TheHeader.vue'
 import TheSidebar from './layouts/TheSidebar.vue'
-import MsToast from '@/components/bases/ui/MsToast.vue'
 
 const isSidebarCollapsed = ref(false)
 
@@ -13,7 +12,6 @@ const handleSidebarCollapse = (collapsed) => {
 
 <template>
   <div class="app">
-    <MsToast />
     <TheHeader />
     <TheSidebar @update:collapsed="handleSidebarCollapse" />
     <main class="app__main" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
